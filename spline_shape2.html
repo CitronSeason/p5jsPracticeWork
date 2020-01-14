@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<!--オフライン時
+    <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.js"></script>
+       -->
+    <script src="js/p5.min.js"></script>
+ 
+    <style>
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        border: 0;
+        overflow: hidden; /*  Disable scrollbars */
+        display: block;  /* No floating content on sides */
+    }
+</style>
+
+    <script>
+</script>
+<script src="http://127.0.0.1:8081/socket.io/socket.io.js"></script>
+<script>
+/*! p5.js v0.10.2 October 14, 2019 */
+
+</script>
+<script>
+let _c;
+function setup(){
+    createCanvas(windowWidth, windowHeight);
+    _c = color(255,255,255);
+}
+let _circlePoints = [[21,17],[32,91],[84,91],[68,19]];
+let _r = [0,0,0,0,0];
+let _nR = [0,0.2,0.4,0.6,0.8]
+function draw(){
+//    background(150);
+    clear();
+    
+    strokeWeight(1);
+    //drawSplineCircle(_c,_circlePoints)
+    //_r += random(-0.2,0.2);
+    //_nR.forEach(function(value,index){_nR[index] += random(-0.05,0.05)});
+    //_nR.sort(compareFunc);
+    points = coordinateTransformation(_r, _nR);
+    
+    console.log(points);
+    drawSplineCircle(_c,points);
+    //console.log(points);
+}
+
+function coordinateTransformation(r, normalizationRadians){
+    var points = [];
+    for(i=0; i< r.length; i++){
+        points.push([
+        r[i] * cos(2*PI* normalizationRadians[i]) + 200*1.1,
+        r[i] * sin(2*PI* normalizationRadians[i]) + 200*1.1
+    ]);
+    }
+    /*
+    normalizationRadians.forEach(radian => {
+        points.push(
+            [r * cos(2*PI* radian)+r*1.1,
+             r * sin(2*PI* radian)+r*1.1]
+        );
+    });
+    */
+    return points;
+}
+
+function compareFunc(a, b) {
+  return a - b;
+}
+
+function drawSplineCircle(color, circlePoints){
+    strokeWeight(0.2);
+    fill(color);
+    beginShape();
+    circlePoints.forEach(function(point, index, array){
+        curveVertex(point[0], point[1]);
+        //console.log(point[0],point[1]);
+    })
+    curveVertex(circlePoints[0][0],circlePoints[0][1]);
+    curveVertex(circlePoints[1][0],circlePoints[1][1]);
+    curveVertex(circlePoints[2][0],circlePoints[2][1]);
+    endShape();
+
+}
+
+
+
+
+//osc via websocket
+
+var socket = io('http://127.0.0.1:8081');
+socket.on('connect', function() {
+    // sends to socket.io server the host/port of oscServer
+    // and oscClient
+    socket.emit('config',
+        {
+            server: {
+                port: 3333,
+                host: '127.0.0.1'
+            },
+            client: {
+                port: 3334,
+                host: '127.0.0.1'
+            }
+        }
+    );
+});
+
+socket.on('message', function(obj){
+	let overhead = 3;
+	for(i = 0; i< obj.length - overhead; i++){
+        _r[i] = obj[overhead + i][1];
+    }
+    
+});
+    </script>
+
+</head>
+</html>

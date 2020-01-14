@@ -29,14 +29,18 @@ function draw(){
     Hours = toDoubleDigits(DD.getHours());
     Minutes = toDoubleDigits(DD.getMinutes());
     Seconds = DD.getSeconds();
-    textSize(330);
-    textAlign(CENTER);
-    text(Hours + ':' + Minutes , windowWidth/2,windowHeight/2)
+
     //draw rect 
     rectYsize = (Seconds/3600+Minutes/60)*windowHeight;
     fill(color(255,205,0));
     noStroke();
     rect(0,windowHeight-rectYsize,windowWidth,rectYsize)
+
+    fill(0);
+    textSize(330);
+    textAlign(CENTER);
+    text(Hours + ':' + Minutes , windowWidth/2,windowHeight/2)
+
 }
 
 var toDoubleDigits = function(num) {
@@ -46,7 +50,43 @@ var toDoubleDigits = function(num) {
     }
    return num;     
 }
+var connection = new WebSocket("ws://127.0.0.1:13254");
+connection.onmessage = function(e) {
+ 
+ console.log(e.data);
+
+};
     </script>
 
+<script src="http://127.0.0.1:8081/socket.io/socket.io.js"></script>
+
+<script>
+   var socket = io('http://127.0.0.1:8081');
+   socket.on('connect', function() {
+        // sends to socket.io server the host/port of oscServer
+        // and oscClient
+        socket.emit('config',
+            {
+                server: {
+                    port: 3333,
+                    host: '127.0.0.1'
+                },
+                client: {
+                    port: 3334,
+                    host: '127.0.0.1'
+                }
+            }
+        );
+    });
+
+    socket.on('message', function(obj) {
+        var status = document.getElementById("status");
+        //status.innerHTML = obj[3][1];
+        console.log(obj);
+    });
+</script>
+
+
 </head>
+<div id="status"></div>
 </html>

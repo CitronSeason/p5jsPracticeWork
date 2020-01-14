@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+    <script src="js/p5.min.js"></script>
+    <style>
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        border: 0;
+        overflow: hidden; /*  Disable scrollbars */
+        display: block;  /* No floating content on sides */
+    }
+</style>
+<script>
+let _c;
+function setup(){
+    createCanvas(windowWidth, windowHeight);
+    _c = color(255,255,0);
+}
+let _circlePoints = [[21,17],[32,91],[84,91],[68,19]];
+let _r = 300;
+let _nR = [0,0.2,0.3,0.5,0.8]
+function draw(){
+//    background(150);
+    clear();
+    
+    strokeWeight(1);
+    //drawSplineCircle(_c,_circlePoints)
+    _r += random(-0.2,0.2);
+    _nR.forEach(function(value,index){_nR[index] = (_nR[index] +random(-0.005,0.005))%1.0});
+    _nR.sort(compareFunc);
+    points = coordinateTransformation(_r, _nR);
+
+    drawSplineCircle(_c,points);
+    //console.log(points);
+}
+
+function coordinateTransformation(r, normalizationRadians){
+    var points = [];
+    normalizationRadians.forEach(radian => {
+        points.push(
+            [r * cos(2*PI* radian)+r*1.1,
+             r * sin(2*PI* radian)+r*1.1]
+        );
+    });
+    return points;
+}
+
+function compareFunc(a, b) {
+  return a - b;
+}
+
+function drawSplineCircle(color, circlePoints){
+    strokeWeight(0.2);
+    fill(color);
+    beginShape();
+    circlePoints.forEach(function(point, index, array){
+        curveVertex(point[0], point[1]);
+        //console.log(point[0],point[1]);
+    })
+    curveVertex(circlePoints[0][0],circlePoints[0][1]);
+    curveVertex(circlePoints[1][0],circlePoints[1][1]);
+    curveVertex(circlePoints[2][0],circlePoints[2][1]);
+    endShape();
+
+}
+
+    </script>
+
+</head>
+</html>
